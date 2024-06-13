@@ -1,97 +1,56 @@
+require_relative "board"
+
 class ConnectFour
-  def initialize(rows = 6, columns = 7, to_win = 4)
-    @rows_num = rows
-    @columns_num = columns
-    @to_win = to_win
-
-    @rows = Array.new(rows) { Array.new(columns, ".") }
-    @last_drop = {column: nil, row_index: nil, piece: nil}
-  end
-
-  def put(piece, column)
-    @rows.each_with_index do |row, row_index|
-      if row[column] == "."
-        row[column] = piece
-        @last_drop = {column:, row_index:, piece:}
-        break
-      else
-        next
-      end
+  class GameFinished < StandardError
+    # @param [Cell] cell
+    def initialize(cell)
+      super("Game finished! Winner: #{cell.value}, position: #{cell.position}")
     end
   end
 
-  def all_done?
-    done_vertically? || done_horizontally? || done_diagonally?
-  end
-
-  def done_vertically?
-    column = @rows.map { |row| row[@last_drop[:column]] }
-    done?(column)
-  end
-
-  def done_horizontally?
-    row = @rows[@last_drop[:row_index]]
-    done?(row)
-  end
-
-  def done_diagonally?
-    done?(positive_slope) || done?(negative_slope)
-  end
-
-  def positive_slope
-    distance_from_edge = [@last_drop[:column], @last_drop[:row_index]].min
-    edge_row = @last_drop[:row_index] - distance_from_edge
-    edge_col = @last_drop[:column] - distance_from_edge
-
-    cell = @rows[edge_row][edge_col]
-    cells = []
-
-    until cell.nil?
-      cells.push(cell)
-      edge_row += 1
-      edge_col += 1
-      cell = @rows.fetch(edge_row, []).fetch(edge_col, nil)
+  class WrongTurn < StandardError
+    # @param [Cell] cell
+    def initialize(cell)
+      super("It's not your turn, #{cell.value}!")
     end
-
-    cells
   end
 
-  def negative_slope
-    row_index_max = @rows.size - 1
-    distance_from_top = row_index_max - @last_drop[:row_index]
-    distance_from_edge = [@last_drop[:column], distance_from_top].min
-    edge_row = @last_drop[:row_index] + distance_from_edge
-    edge_col = @last_drop[:column] - distance_from_edge
+  attr_reader :board, :win_threshold
 
-    cell = @rows[edge_row][edge_col]
-    cells = []
+  # @return [Cell]
+  attr_reader :last_drop
 
-    until cell.nil?
-      cells.push(cell)
-      edge_row -= 1
-      edge_col += 1
-      cell = @rows.fetch(edge_row, []).fetch(edge_col, nil)
+  def initialize(rows = 6, columns = 7, win_threshold = 4)
+    @board         = Board.new(rows, columns, nil)
+    @win_threshold = win_threshold
+    @last_drop     = nil
+  end
+
+  def drop(piece, column)
+    raise WrongTurn.new(last_drop) if wrong_turn?(piece)
+    raise GameFinished.new(last_drop) if game_finished?
+
+    board.push_down(piece, column).tap do |cell|
+      @last_drop     = cell
+      @game_finished = compute_result
     end
+  end
 
-    cells
+  def game_finished?
+    @game_finished
+  end
+
+  def wrong_turn?(current_piece)
+    last_drop&.contains?(current_piece)
   end
 
   def winner
-    @last_drop[:piece]
+    game_finished? ? last_drop.value : nil
   end
 
   private
 
-  def done?(cells)
-    @to_win == cells.inject(0) do |count, piece|
-      case piece
-      when @last_drop[:piece]
-        count + 1
-      when "."
-        count
-      else
-        0
-      end
-    end
+  def compute_result
+    last_drop.repetitions.any? { |rep_count| rep_count >= win_threshold }
   end
 end

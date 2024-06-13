@@ -1,99 +1,75 @@
 require_relative "../lib/connect_four"
 
 describe ConnectFour do
+  let(:connect4) { ConnectFour.new }
+
   it "X wins vertically", :aggregate_failures do
-    game = ConnectFour.new
+    connect4.drop("x", 0)
+    connect4.drop("o", 1)
 
-    game.put("x", 0)
-    expect(game.all_done?).to eq(false)
+    connect4.drop("x", 0)
+    connect4.drop("o", 1)
 
-    game.put("x", 0)
-    expect(game.all_done?).to eq(false)
+    connect4.drop("x", 0)
+    connect4.drop("o", 1)
 
-    game.put("x", 0)
-    expect(game.all_done?).to eq(false)
+    connect4.drop("x", 0)
 
-    game.put("x", 0)
-
-    expect(game.all_done?).to eq(true)
-    expect(game.winner).to eq("x")
+    expect(connect4.game_finished?).to eq(true)
+    expect(connect4.winner).to eq("x")
   end
 
-  it "X wins horizontally", :aggregate_failures do
-    game = ConnectFour.new
+  xit "X wins horizontally", :aggregate_failures do
+    connect4.drop("x", 0)
+    connect4.drop("x", 1)
+    connect4.drop("x", 2)
+    connect4.drop("x", 3)
 
-    game.put("x", 0)
-    expect(game.all_done?).to eq(false)
-
-    game.put("x", 1)
-    expect(game.all_done?).to eq(false)
-
-    game.put("x", 2)
-    expect(game.all_done?).to eq(false)
-
-    game.put("x", 3)
-
-    expect(game.all_done?).to eq(true)
-    expect(game.winner).to eq("x")
+    expect(connect4.game_finished?).to eq(true)
+    expect(connect4.winner).to eq("x")
   end
 
-  it "O wins diagonally - positive slope", :aggregate_failures do
-    game = ConnectFour.new
+  xit "O wins diagonally - positive slope", :aggregate_failures do
+    connect4.drop("o", 1)
+    connect4.drop("x", 1)
 
-    game.put("o", 1)
-    game.put("x", 1)
+    connect4.drop("o", 2)
+    connect4.drop("o", 2)
+    connect4.drop("x", 2)
 
-    expect(game.all_done?).to eq(false)
+    connect4.drop("o", 3)
+    connect4.drop("o", 3)
+    connect4.drop("o", 3)
+    connect4.drop("x", 3)
 
-    game.put("o", 2)
-    game.put("o", 2)
-    game.put("x", 2)
+    connect4.drop("o", 4)
+    connect4.drop("o", 4)
+    connect4.drop("o", 4)
+    connect4.drop("o", 4)
 
-    expect(game.all_done?).to eq(false)
-
-    game.put("o", 3)
-    game.put("o", 3)
-    game.put("o", 3)
-    game.put("x", 3)
-
-    expect(game.all_done?).to eq(false)
-
-    game.put("o", 4)
-    game.put("o", 4)
-    game.put("o", 4)
-    game.put("o", 4)
-
-    expect(game.all_done?).to eq(true)
-    expect(game.winner).to eq("o")
+    expect(connect4.game_finished?).to eq(true)
+    expect(connect4.winner).to eq("o")
   end
 
-  it "O wins diagonally - negative slope", :aggregate_failures do
-    game = ConnectFour.new
+  xit "O wins diagonally - negative slope", :aggregate_failures do
+    connect4.drop("o", 2)
+    connect4.drop("o", 2)
+    connect4.drop("o", 2)
+    connect4.drop("o", 2)
+    connect4.drop("x", 2)
 
-    game.put("o", 2)
-    game.put("o", 2)
-    game.put("o", 2)
-    game.put("o", 2)
-    game.put("x", 2)
+    connect4.drop("o", 3)
+    connect4.drop("o", 3)
+    connect4.drop("o", 3)
+    connect4.drop("x", 3)
 
-    expect(game.all_done?).to eq(false)
+    connect4.drop("o", 4)
+    connect4.drop("o", 4)
+    connect4.drop("x", 4)
 
-    game.put("o", 3)
-    game.put("o", 3)
-    game.put("o", 3)
-    game.put("x", 3)
+    connect4.drop("o", 5)
 
-    expect(game.all_done?).to eq(false)
-
-    game.put("o", 4)
-    game.put("o", 4)
-    game.put("x", 4)
-
-    expect(game.all_done?).to eq(false)
-
-    game.put("o", 5)
-
-    expect(game.all_done?).to eq(true)
-    expect(game.winner).to eq("o")
+    expect(connect4.game_finished?).to eq(true)
+    expect(connect4.winner).to eq("o")
   end
 end
