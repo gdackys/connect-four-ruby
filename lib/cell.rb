@@ -25,6 +25,36 @@ class Cell
                 # @return [Cell]
                 :bottom_right
 
+  # @return [Array<Array<Cell>>]
+  def self.grid(rows, columns, value)
+    grid = Array.new(columns) { Array.new(rows) { Cell.new(value) } }
+
+    max_c = columns - 1
+    max_r = rows - 1
+
+    columns.times do |c|
+      rows.times do |r|
+        cell = grid[c][r]
+
+        cell.position     = [c, r]
+
+        cell.top_left     = grid[c - 1][r - 1] if c > 0 && r > 0
+        cell.top          = grid[c][r - 1] if r > 0
+        cell.top_right    = grid[c + 1][r - 1] if c < max_c && r > 0
+
+        cell.right        = grid[c + 1][r] if c < max_c
+
+        cell.bottom_right = grid[c + 1][r + 1] if c < max_c && r < max_r
+        cell.bottom       = grid[c][r + 1] if r < max_r
+        cell.bottom_left  = grid[c - 1][r + 1] if c > 0 && r < max_r
+
+        cell.left         = grid[c - 1][r] if c > 0
+      end
+    end
+
+    grid
+  end
+
   def initialize(value)
     @value = value
   end
