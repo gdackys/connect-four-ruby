@@ -3,8 +3,8 @@ require_relative "cell"
 class Board
   attr_reader :grid
 
-  def initialize(rows, columns, value)
-    @grid = self.class.cells(rows, columns, value)
+  def initialize(columns, rows, value)
+    @grid = Cell.grid(columns, rows, value)
   end
 
   def push_down(value, column_index)
